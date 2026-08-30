@@ -7,12 +7,21 @@ def probe(path):
  if not shutil.which("ffprobe"): raise RuntimeError("ffprobe not found")
  cmd=["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(path)]
  return json.loads(subprocess.check_output(cmd,text=True))
+def duration_seconds(data):
+ fmt=data.get("format") if isinstance(data.get("format"),dict) else {}
+ streams=data.get("streams") if isinstance(data.get("streams"),list) else []
+ values=[fmt.get("duration"),*(x.get("duration") for x in streams if isinstance(x,dict))]
+ for raw in values:
+  if raw in (None,"","N/A"): continue
+  try: value=float(raw)
+  except (TypeError,ValueError): continue
+  if math.isfinite(value) and value >= 0: return value
+ raise ValueError("duration must be a finite non-negative number in format or stream metadata")
 def inspect(data,preset=None):
  vids=[s for s in data.get("streams",[]) if s.get("codec_type")=="video"]
  auds=[s for s in data.get("streams",[]) if s.get("codec_type")=="audio"]
  fmt=data.get("format",{}); out={"ok":True,"checks":[],"summary":{}}
- dur=float(fmt.get("duration") or 0)
- if not math.isfinite(dur) or dur < 0: raise ValueError("duration must be a finite non-negative number")
+ dur=duration_seconds(data)
  out["summary"]["duration_sec"]=round(dur,3)
  if vids:
   v=vids[0]; w=int(v.get("width") or 0); h=int(v.get("height") or 0)
