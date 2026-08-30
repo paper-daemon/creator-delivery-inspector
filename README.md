@@ -34,3 +34,7 @@ CLIを自分で回すのではなく、動画・音声の納品前QAとCSV一覧
 https://coconala.com/services/3914156
 
 無料ツールの機能はサービス購入なしでもそのまま使えます。
+
+## Duration metadata boundary
+
+`format.duration` が無い場合はvideo/audio streamのdurationへfallbackします。どこにも有限・非負のdurationが無い場合は `0秒` とみなしてPASSせず、検査エラーとしてfail-closedにします。
