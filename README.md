@@ -23,6 +23,8 @@ short.mp4,True,2.0,1080,1920,mpeg4,aac,44100,1,
 - ffprobe が必要です
 - CSVはExcelで開きやすいUTF-8 BOM付き
 - 個別ファイルのprobe失敗もbatch全体を止めず`error`列へ残します
+- durationはfiniteかつ0以上だけを正常メタデータとして扱います
+- [duration metadataの検証境界](docs/duration-metadata-boundary.md)
 - MIT License
 
 ## 任せたい場合
