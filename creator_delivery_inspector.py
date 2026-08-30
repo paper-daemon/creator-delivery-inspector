@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse,csv,json,subprocess,sys,shutil
+import argparse,csv,json,subprocess,sys,shutil,math
 from pathlib import Path
 PRESETS={"shorts":{"max_duration":65,"min_width":720,"min_height":1280},"landscape":{"min_width":1280,"min_height":720}}
 MEDIA_EXTS={".mp4",".mov",".mkv",".webm",".m4v",".avi",".mp3",".wav",".m4a",".aac",".flac",".ogg"}
@@ -11,7 +11,9 @@ def inspect(data,preset=None):
  vids=[s for s in data.get("streams",[]) if s.get("codec_type")=="video"]
  auds=[s for s in data.get("streams",[]) if s.get("codec_type")=="audio"]
  fmt=data.get("format",{}); out={"ok":True,"checks":[],"summary":{}}
- dur=float(fmt.get("duration") or 0); out["summary"]["duration_sec"]=round(dur,3)
+ dur=float(fmt.get("duration") or 0)
+ if not math.isfinite(dur) or dur < 0: raise ValueError("duration must be a finite non-negative number")
+ out["summary"]["duration_sec"]=round(dur,3)
  if vids:
   v=vids[0]; w=int(v.get("width") or 0); h=int(v.get("height") or 0)
   out["summary"].update({"video_codec":v.get("codec_name"),"width":w,"height":h,"fps":v.get("avg_frame_rate")})
