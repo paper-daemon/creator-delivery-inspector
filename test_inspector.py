@@ -23,6 +23,14 @@ class T(unittest.TestCase):
   r=inspect(d,"shorts")
   self.assertTrue(r["ok"])
   self.assertEqual(r["summary"]["duration_sec"],30.0)
+ def test_longest_stream_duration_is_used_when_format_duration_is_missing(self):
+  d={"format":{},"streams":[
+   {"codec_type":"audio","duration":"10","codec_name":"aac","sample_rate":"48000","channels":2},
+   {"codec_type":"video","duration":"70","width":1080,"height":1920,"codec_name":"x","avg_frame_rate":"30/1"},
+  ]}
+  r=inspect(d,"shorts")
+  self.assertFalse(r["ok"])
+  self.assertEqual(r["summary"]["duration_sec"],70.0)
  def test_media_files_filters(self):
   with tempfile.TemporaryDirectory() as td:
    p=Path(td); (p/'a.mp4').write_bytes(b'x'); (p/'b.txt').write_text('x'); (p/'c.wav').write_bytes(b'x')
