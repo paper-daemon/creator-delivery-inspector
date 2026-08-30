@@ -37,4 +37,4 @@ https://coconala.com/services/3914156
 
 ## Duration metadata boundary
 
-`format.duration` が無い場合はvideo/audio streamのdurationへfallbackします。どこにも有限・非負のdurationが無い場合は `0秒` とみなしてPASSせず、検査エラーとしてfail-closedにします。
+`format.duration` が正常ならそれを使います。container durationが無い場合は、finiteかつ非負なvideo/audio stream durationの**最大値**へfallbackします。短い補助streamを先に拾って本編時間を過小評価しないためです。どこにも正常なdurationが無い場合は `0秒` とみなしてPASSせず、検査エラーとしてfail-closedにします。
