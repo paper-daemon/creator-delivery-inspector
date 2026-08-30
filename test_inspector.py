@@ -14,6 +14,15 @@ class T(unittest.TestCase):
    with self.subTest(value=value):
     with self.assertRaisesRegex(ValueError,"finite non-negative"):
      inspect(d,"shorts")
+ def test_missing_duration_is_not_zero_second_success(self):
+  d={"format":{},"streams":[{"codec_type":"video","width":1080,"height":1920,"codec_name":"x","avg_frame_rate":"30/1"}]}
+  with self.assertRaisesRegex(ValueError,"finite non-negative"):
+   inspect(d,"shorts")
+ def test_stream_duration_is_used_when_format_duration_is_missing(self):
+  d={"format":{},"streams":[{"codec_type":"video","duration":"30","width":1080,"height":1920,"codec_name":"x","avg_frame_rate":"30/1"}]}
+  r=inspect(d,"shorts")
+  self.assertTrue(r["ok"])
+  self.assertEqual(r["summary"]["duration_sec"],30.0)
  def test_media_files_filters(self):
   with tempfile.TemporaryDirectory() as td:
    p=Path(td); (p/'a.mp4').write_bytes(b'x'); (p/'b.txt').write_text('x'); (p/'c.wav').write_bytes(b'x')
