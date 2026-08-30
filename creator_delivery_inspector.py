@@ -10,12 +10,20 @@ def probe(path):
 def duration_seconds(data):
  fmt=data.get("format") if isinstance(data.get("format"),dict) else {}
  streams=data.get("streams") if isinstance(data.get("streams"),list) else []
- values=[fmt.get("duration"),*(x.get("duration") for x in streams if isinstance(x,dict))]
- for raw in values:
+ raw_format=fmt.get("duration")
+ if raw_format not in (None,"","N/A"):
+  try: value=float(raw_format)
+  except (TypeError,ValueError): value=None
+  if value is not None and math.isfinite(value) and value >= 0: return value
+ stream_values=[]
+ for stream in streams:
+  if not isinstance(stream,dict): continue
+  raw=stream.get("duration")
   if raw in (None,"","N/A"): continue
   try: value=float(raw)
   except (TypeError,ValueError): continue
-  if math.isfinite(value) and value >= 0: return value
+  if math.isfinite(value) and value >= 0: stream_values.append(value)
+ if stream_values: return max(stream_values)
  raise ValueError("duration must be a finite non-negative number in format or stream metadata")
 def inspect(data,preset=None):
  vids=[s for s in data.get("streams",[]) if s.get("codec_type")=="video"]
